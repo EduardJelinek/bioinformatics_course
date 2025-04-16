@@ -106,7 +106,7 @@ tabix -p vcf ~/bioinformatics_assignment/results/NGS1.hg19.vcf.gz
 
 #filter the vcf
 vcffilter -f "QUAL > 1 & QUAL / AO > 10 & SAF > 0 & SAR > 0 & RPR > 1 & RPL > 1" \
-~/bioinformatics_assignment/results/NGS1.hg1S1.hg19.vcf.gz > ~/bioinformatics_assignment/results/NGS1.hg19.filtered.vcf
+~/bioinformatics_assignment/results/NGS1.hg19.vcf.gz > ~/bioinformatics_assignment/results/NGS1.hg19.filtered.vcf
 
 #intresect with bed file
 bedtools intersect -header -wa -a ~/bioinformatics_assignment/results/NGS1.hg19.filtered.vcf \
@@ -117,7 +117,7 @@ tabix -p vcf ~/bioinformatics_assignment/results/NGS1.hg19.filtered.intersect.vc
 #annotation
 #convert vcf to annovar input format
 perl ~/annovar.latest/annovar/convert2annovar.pl \
--format vcf4 ~/bioinformatics_assignment/results/NGS1.hg19.filtered.intersect.vcf.gz > bioinformatics_assignment/results/NGS1.hg19.f>
+-format vcf4 ~/bioinformatics_assignment/results/NGS1.hg19.filtered.intersect.vcf.gz > bioinformatics_assignment/results/NGS1.hg19.filtered.intersect.avinput
 
 #generate csv file
 perl ~/annovar.latest/annovar/table_annovar.pl bioinformatics_assignment/results/NGS1.hg19.filtered.intersect.avinput \
