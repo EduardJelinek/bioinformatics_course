@@ -18,6 +18,7 @@ wget https://s3-eu-west-1.amazonaws.com/workshopdata2017/annotation.bed
 cd ~/bioinformatics_assignment/data/untrimmed_fastq
 mv NGS0001.R1.fastq.gz NGS1.R1.fastq.gz
 mv NGS0001.R2.fastq.gz NGS1.R1.fastq.gz
+cd
 
 #fastqc of untrimmed filescd ~/bioinformatics_assignment/data/untrimmed_fastq
 cd ~/bioinformatics_assignment/data/untrimmed_fastq
