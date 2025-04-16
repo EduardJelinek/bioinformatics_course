@@ -1,0 +1,226 @@
+---
+title: "Advanced bioinformatics 2025 assignment"
+author: "k21083247"
+date: "2025-04-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+## Task 3.1
+
+```{r}
+#sum of all integers between 5 and 55 
+sum(5:55)
+```
+## Task 3.2
+
+```{r}
+#define the sumfun function and calculate sum from 5 to 10, 20 and 100
+sumfun <- function(n) sum(5:n)
+sumfun(10)
+sumfun(20)
+sumfun(100)
+```
+## Task 3.3
+```{r}
+#start vector to store the fibonacci numbers
+fib <- (1:12)
+fib[1] <- 0
+fib[2] <- 1
+for (i in 3:12)
+  fib[i] <- fib[i - 1] + fib[i - 2]
+#printing the sequence
+fib
+```
+## Task 3.4
+```{r}
+#load ggplot
+library(ggplot2)
+#make the boxplot
+ggplot(mtcars, aes(x = factor(gear), y = mpg, fill = factor(gear))) + 
+  geom_boxplot() +
+  labs(x="number of gears",y=("miles per gallon"))
+```
+## Task 3.5
+```{r}
+#use lm function to generate linear regression model between distance and speed
+linear <- lm(dist~speed, data=cars)
+#use summary to generate summary statistics
+summary(linear)
+#intercept:-17.5791 Std. error: 6.7584
+#slope: 3.9324 Std. error: 0.4155
+#units used in the cars dataset: miles per hour for speed and feet for distance
+```
+## Task 3.6
+```{r}
+ggplot(cars, aes(x=speed,y=dist))+
+  geom_point()+
+  geom_smooth(method = lm)+
+  labs(x="speed",y="distance")
+```
+## Task 3.7
+```{r}
+#total distance=reaction time*speed+speed^2
+reaction_model <- lm(dist ~ speed + I(speed^2),data=cars)
+summary(reaction_model)
+#coefficient for speed=0.91329
+#speed is in miles per hour, therefore convert to feet per second
+#1mph=1.467fps
+#extract coefficient for speed
+reaction_ft_per_mph <- coef(reaction_model)["speed"]
+reaction_time <- reaction_ft_per_mph/1.467
+reaction_time
+#gives reaction time of 0.622, which is reasonable for human reaction time
+#plot the results
+ggplot(cars, aes(x=speed,y=dist))+
+  geom_point()+
+  stat_smooth(method="lm",formula=y~x+I(x^2))+
+  labs(x="speed",y="stopping distance")
+```
+## Task 3.8
+```{r}
+#load data
+setwd("C:/Users/Eda/Downloads/LMS_RNAseq_short-master-2023-final (1)/LMS_RNAseq_short-master-2023-final/course/exercises/data")
+count_data <- read.table("exercise1_counts.csv", header=TRUE, sep =",", row.names=1)
+sample_description <- read.delim("exercise1_sample_description.info")
+```
+## Task 3.9
+```{r}
+#create col_data and check dimensions
+col_data <- sample_description
+dim(col_data)
+dim(count_data)
+```
+## Task 3.10
+```{r}
+#create DESeqDataSet
+#load library
+library(DESeq2)
+dds <- DESeqDataSetFromMatrix(countData=count_data, colData=col_data, design=~condition)
+```
+## Task 3.11
+```{r}
+#perform rlog and vst transformation on dds
+rlog_data <- rlog(dds)
+vst_data <- vst(dds)
+```
+
+## Task 3.12 
+```{r}
+#creating a heatmap of count matrix of the top 40 expressed genes
+#using rlog data
+library(pheatmap)
+#estimate size factors
+dds <- estimateSizeFactors(dds)
+#get dds normalised counts
+dds_counts <- counts(dds, normalized = TRUE)
+#get normalised counts of top 40 genes
+rlog_top40 <- order(rowMeans(dds_counts), decreasing = TRUE)[1:40]
+pheatmap(assay(rlog_data, cellheight = 15)[rlog_top40, ])
+#using vst data
+#get normalised counts of top 40 genes
+vst_top40 <- order(rowMeans(dds_counts), decreasing = TRUE)[1:40]
+pheatmap(assay(vst_data, cellheight = 15)[vst_top40, ])
+```
+## Task 3.13
+```{r}
+#generating SDM from rlog transformed data
+#calculate sample distance
+sample_dist <- dist(t(assay(rlog_data)))
+#convert to matrix format
+sample_dist_matrix <- as.matrix(sample_dist)
+#add row names
+rownames(sample_dist_matrix) <- rlog_data$condition
+colnames(sample_dist_matrix) <- NULL
+#add colours
+library(RColorBrewer)
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+#create heatmap
+pheatmap(sample_dist_matrix, clustering_distance_rows = sample_dist, clustering_distance_cols = sample_dist, col = colors)
+```
+# Task 3.14
+```{r}
+#perform PCA using rlog
+#extract rlog matrix
+rlog_matrix <- assay(rlog_data)
+#transpose so samples are in rows
+pca_rlog <- prcomp(t(rlog_matrix), center = TRUE, scale = FALSE)
+pca__rlog_summary <- summary(pca_rlog)
+pca__rlog_summary
+# % significance value of PC1= 35.0%
+# % significance value of PC2= 31.4%
+```
+## Task 3.15
+```{r}
+#perform PCA using vst
+#extract vst matrix
+vst_matrix <- assay(vst_data)
+#transpose so samples are in rows
+pca_vst <- prcomp(t(vst_matrix), center = TRUE, scale = FALSE)
+pca__vst_summary <- summary(pca_vst)
+pca__vst_summary
+# % significance value of PC1= 33.7%
+# % significance value of PC2= 28.0%
+```
+## Task 3.16
+```{r}
+#load data
+setwd("C:/Users/Eda/Downloads/LMS_ChIPseq_short-master-2023-final (1)/LMS_ChIPseq_short-master-2023-final/course/data/MacsPeaks")
+rep1_peaks <- read.delim("mycmelrep1_peaks.xls", header = TRUE, comment.char = "#")
+rep2_peaks <- read.delim("mycmelrep2_peaks.xls", header = TRUE, comment.char = "#")
+#convert data to GRanges
+library(GenomicRanges)
+gr1 <- GRanges(seqnames = rep1_peaks$chr, ranges = IRanges(start = rep1_peaks$start, end = rep1_peaks$end))
+gr2 <- GRanges(seqnames = rep2_peaks$chr, ranges = IRanges(start = rep2_peaks$start, end = rep2_peaks$end))
+#find common peaks
+common_peaks <- intersect(gr1, gr2)
+common_peaks
+```
+## Task 3.17
+```{r}
+#rank top 500 by fold enrichment and resize to 200bp around center
+#add fold_enrichment metadata
+mcols(gr1)$fold_enrichment <- rep1_peaks$fold_enrichment
+#order and select top 500 peaks
+top500 <- gr1[order(mcols(gr1)$fold_enrichment, decreasing = TRUE)][1:500]
+#resize
+top500_resized <- resize(top500, width = 200, fix = "center")
+```
+
+## Task 3.18
+```{r}
+#extract sequences under the file and write them to a fasta file
+#import the correct genome
+library(BSgenome)
+library(BSgenome.Mmusculus.UCSC.mm9)
+#extract sequences
+seqlevelsStyle(top500_resized) <- seqlevelsStyle(BSgenome.Mmusculus.UCSC.mm9)
+top500_sequences <- getSeq(BSgenome.Mmusculus.UCSC.mm9, top500_resized)
+names(top500_sequences) <- paste0("peak_", seq_along(top500_sequences))
+#write to fasta file
+writeXStringSet(top500_sequences, filepath = "top500_sequences.fasta")
+```
