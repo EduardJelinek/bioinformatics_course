@@ -60,7 +60,7 @@ mv hg19.fa.gz ~/bioinformatics_assignment/data/reference
 bwa index ~/bioinformatics_assignment/data/reference/hg19.fa.gz
 mkdir ~/bioinformatics_assignment/data/aligned_data
 
-bwa mem -t 4 -v 1 -R '@RG\tID:HWI-D0011.50.H7AP8ADXX.1.WES01\tSM:WES01\tPL:ILLUMINA\tLB:nextera-wes01-blood\tDT:2017-02-23\tPU:HWI-D00119' -I 250,50 \
+bwa mem -t 4 -v 1 -R '@RG\tID:HWI-D0011.50.H7AP8ADXX.1.NGS01\tSM:NGS01\tPL:ILLUMINA\tLB:nextera-ngs01-blood\tDT:2017-02-23\tPU:HWI-D00119' -I 250,50 \
 ~/bioinformatics_assignment/data/reference/hg19.fa.gz \
 ~/bioinformatics_assignment/results/trimmed_fastq/NGS1.R1.trimmed.paired.fq.gz \
 ~/bioinformatics_assignment/results/trimmed_fastq/NGS1.R2.trimmed.paired.fq.gz > \
